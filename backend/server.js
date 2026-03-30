@@ -26,7 +26,7 @@ const jobRoutes = require('./routes/jobRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const assessmentRoutes = require('./routes/assessmentRoutes');
 const interviewRoutes = require('./routes/interviewRoutes');
-// const notificationRoutes = require('./routes/notificationRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 // ============================================
 // Routes Use
@@ -36,7 +36,7 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/assessment', assessmentRoutes);
 app.use('/api/interview', interviewRoutes);
-// app.use('/api/notifications', notificationRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // ============================================
 // Root Route - Test karne ke liye
@@ -51,7 +51,7 @@ app.get('/', (req, res) => {
             profile: '/api/profile',
             assessment: '/api/assessment',
             interview: '/api/interview',
-            // notifications: '/api/notifications'
+            notifications: '/api/notifications'
         }
     });
 });

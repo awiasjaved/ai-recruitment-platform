@@ -5,8 +5,8 @@ const db = require('../config/db');
 // ============================================
 // TOKEN Genration Function
 // ============================================
-const generateToken = (id, role) => {
-    return jwt.sign({ id, role }, process.env.JWT_SECRET, {
+const generateToken = (id, role, name) => {
+    return jwt.sign({ id, role, name }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRE || '7d'
     });
 };
@@ -137,7 +137,7 @@ const login = async (req, res) => {
         }
 
         // Token genrtae
-        const token = generateToken(user.id, user.role);
+        const token = generateToken(user.id, user.role, user.name);
 
         res.status(200).json({
             success: true,
