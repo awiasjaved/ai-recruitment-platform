@@ -5,7 +5,7 @@ const protect = async (req, res, next) => {
     try {
         let token;
 
-        // Header se token lao
+        // Token From header
         if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
             token = req.headers.authorization.split(' ')[1];
         }
@@ -17,10 +17,10 @@ const protect = async (req, res, next) => {
             });
         }
 
-        // Token verify karo
+        // verify token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        // User database se lao
+        // Get user from token
         const [users] = await db.query(
             'SELECT id, name, email, role FROM users WHERE id = ?',
             [decoded.id]

@@ -161,7 +161,7 @@ const login = async (req, res) => {
 // ============================================
 const getMe = async (req, res) => {
     try {
-        // req.user authMiddleware se aata hai
+        // req.user authMiddleware
         const [users] = await db.query(
             'SELECT id, name, email, role, created_at FROM users WHERE id = ?',
             [req.user.id]
@@ -176,7 +176,7 @@ const getMe = async (req, res) => {
 
         const user = users[0];
 
-        // Role ke hisaab se profile bhi lao
+        // profile view like role
         let profile = null;
 
         if (user.role === 'job_seeker') {
@@ -243,11 +243,11 @@ const changePassword = async (req, res) => {
             });
         }
 
-        // Naya password hash karo
+        // New password hash
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-        // Update karo
+        // Update
         await db.query(
             'UPDATE users SET password = ? WHERE id = ?',
             [hashedPassword, req.user.id]

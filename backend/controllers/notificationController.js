@@ -1,7 +1,7 @@
 const db = require('../config/db');
 
 // ============================================
-// APNI NOTIFICATIONS DEKHNA
+// NOTIFICATIONS View
 // GET /api/notifications
 // ============================================
 const getNotifications = async (req, res) => {
@@ -39,7 +39,7 @@ const getNotifications = async (req, res) => {
 };
 
 // ============================================
-// NOTIFICATION PADHNA (read mark karna)
+// NOTIFICATION Read(read mark karna)
 // PUT /api/notifications/:id/read
 // ============================================
 const markAsRead = async (req, res) => {
@@ -66,7 +66,7 @@ const markAsRead = async (req, res) => {
 };
 
 // ============================================
-// SAARI NOTIFICATIONS PADHNA
+// All NOTIFICATIONS Read
 // PUT /api/notifications/read-all
 // ============================================
 const markAllAsRead = async (req, res) => {
@@ -92,7 +92,7 @@ const markAllAsRead = async (req, res) => {
 };
 
 // ============================================
-// NOTIFICATION DELETE KARNA
+// NOTIFICATION DELETE
 // DELETE /api/notifications/:id
 // ============================================
 const deleteNotification = async (req, res) => {

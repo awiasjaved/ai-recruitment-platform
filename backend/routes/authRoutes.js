@@ -7,7 +7,7 @@ const { protect } = require('../middleware/authMiddleware');
 router.post('/register', register);
 router.post('/login', login);
 
-// Protected routes (login zaroori hai)
+// Protected routes
 router.get('/me', protect, getMe);
 router.put('/change-password', protect, changePassword);
 

@@ -39,70 +39,75 @@ const uploadVideo = multer({
 // ============================================
 const interviewQuestions = {
     'web development': [
-        'Apna web development ka experience batao. Kaunse projects kiye hain?',
-        'React ya any frontend framework mein kaam karne ka experience hai?',
-        'REST API design karne ka tariqa batao.',
-        'Database optimization ke liye kya karte ho?',
-        'Team mein kaam karne ka experience batao.',
-        'Koi mushkil bug tha jo tumne solve kiya? Batao kaise kiya.',
-        'Apni sabse bari technical achievement kya hai?'
+        'Tell us about your experience in web development. What projects have you worked on?',
+        'Do you have experience working with React or any other frontend framework?',
+        'Explain how you design REST APIs.',
+        'What do you do for database optimization?',
+        'Tell us about your experience working in a team.',
+        'Tell us about a difficult bug you faced and how you solved it.',
+        'What is your biggest technical achievement so far?'
     ],
+
     'python': [
-        'Python mein apna experience batao. Kaunse projects kiye?',
-        'Object Oriented Programming Python mein kaise use karte ho?',
-        'Python libraries jo zyada use karti ho batao.',
-        'Performance optimization Python mein kaise karte ho?',
-        'Testing Python projects mein kaise karte ho?',
-        'Koi complex problem thi jo Python se solve ki? Batao.',
-        'Python mein best practices kya follow karte ho?'
+        'Tell us about your experience with Python. What kind of projects have you worked on?',
+        'How do you use Object Oriented Programming concepts in Python?',
+        'Which Python libraries do you use the most?',
+        'How do you optimize performance in Python?',
+        'How do you test your Python projects?',
+        'Describe a complex problem you solved using Python.',
+        'What best practices do you follow while writing Python code?'
     ],
+
     'data science': [
-        'Data science mein apna experience batao.',
-        'Kaunse ML algorithms use kiye hain aur kyun?',
-        'Data cleaning process explain karo.',
-        'Model evaluation ke liye kya metrics use karte ho?',
-        'Koi real world data science project explain karo.',
-        'Big data ke saath kaise deal karte ho?',
-        'Data visualization ke liye kaunse tools use karte ho?'
+        'Tell us about your experience in Data Science.',
+        'Which Machine Learning algorithms have you used and why?',
+        'Explain your data cleaning process.',
+        'What metrics do you use for model evaluation?',
+        'Describe a real-world data science project you have worked on.',
+        'How do you handle big data?',
+        'Which tools do you use for data visualization?'
     ],
+
     'graphic design': [
-        'Graphic design mein apna experience batao.',
-        'Kaunse design tools use karte ho?',
-        'Client ke saath design process kaise manage karte ho?',
-        'Brand identity design karne ka tariqa batao.',
-        'Koi creative challenge tha? Kaise solve kiya?',
-        'Design trends ke saath update kaise rehte ho?',
-        'Typography aur color theory ka knowledge batao.'
+        'Tell us about your experience in graphic design.',
+        'Which design tools do you use?',
+        'How do you manage the design process with clients?',
+        'Explain your approach to brand identity design.',
+        'Tell us about a creative challenge you faced and how you solved it.',
+        'How do you stay updated with current design trends?',
+        'What is your knowledge of typography and color theory?'
     ],
+
     'mobile development': [
-        'Mobile development mein apna experience batao.',
-        'Android ya iOS ya cross platform - kya prefer karte ho aur kyun?',
-        'App performance optimize karne ke liye kya karte ho?',
-        'Push notifications implement karne ka tariqa batao.',
-        'App store submission process experience hai?',
-        'Koi complex mobile feature implement ki? Batao.',
-        'Mobile security ke liye kya practices follow karte ho?'
+        'Tell us about your experience in mobile development.',
+        'Do you prefer Android, iOS, or cross-platform development? Why?',
+        'What do you do to optimize app performance?',
+        'Explain how you implement push notifications.',
+        'Do you have experience with the App Store or Play Store submission process?',
+        'Tell us about a complex mobile feature you have implemented.',
+        'What security practices do you follow in mobile app development?'
     ],
+
     'default': [
-        'Apna professional experience batao.',
-        'Is field mein aane ki motivation kya thi?',
-        'Apni strongest skill kya hai?',
-        'Team mein kaam karne ka experience batao.',
-        'Pressure mein kaise kaam karte ho?',
-        'Aglay 5 salon mein khud ko kahan dekhte ho?',
-        'Hamari company mein kyun join karna chahte ho?'
+        'Tell us about your professional experience.',
+        'What motivated you to enter this field?',
+        'What is your strongest skill?',
+        'Tell us about your experience working in a team.',
+        'How do you work under pressure?',
+        'Where do you see yourself in the next 5 years?',
+        'Why do you want to join our company?'
     ]
 };
 
 // ============================================
-// INTERVIEW SHURU KARNA
+// INTERVIEW Start
 // POST /api/interview/start
 // ============================================
 const startInterview = async (req, res) => {
     try {
         const { job_id, skill_domain } = req.body;
 
-        // Seeker profile lao
+        // Seeker profile 
         const [profiles] = await db.query(
             'SELECT id FROM job_seeker_profiles WHERE user_id = ?',
             [req.user.id]
@@ -117,7 +122,7 @@ const startInterview = async (req, res) => {
 
         const seekerId = profiles[0].id;
 
-        // Pehle se pending interview check karo
+        // Check pending interview
         const [pending] = await db.query(
             `SELECT id FROM interviews 
              WHERE seeker_id = ? AND status = 'pending'`,
@@ -132,11 +137,11 @@ const startInterview = async (req, res) => {
             });
         }
 
-        // Questions select karo
+        // Select Questions
         const domain = skill_domain ? skill_domain.toLowerCase() : 'default';
         const questions = interviewQuestions[domain] || interviewQuestions['default'];
 
-        // Interview database mein save karo
+        // Interview Save in database 
         const [result] = await db.query(
             `INSERT INTO interviews (seeker_id, job_id, responses, status) 
              VALUES (?, ?, ?, 'pending')`,
@@ -168,7 +173,7 @@ const startInterview = async (req, res) => {
 };
 
 // ============================================
-// INTERVIEW RESPONSES SAVE KARNA
+// INTERVIEW RESPONSES SAVE
 // POST /api/interview/save-response/:id
 // ============================================
 const saveResponse = async (req, res) => {
@@ -176,7 +181,7 @@ const saveResponse = async (req, res) => {
         const { question_index, answer } = req.body;
         const interviewId = req.params.id;
 
-        // Interview lao
+        // Interview
         const [interviews] = await db.query(
             `SELECT i.* FROM interviews i
              JOIN job_seeker_profiles jsp ON i.seeker_id = jsp.id
@@ -194,7 +199,7 @@ const saveResponse = async (req, res) => {
         const interview = interviews[0];
         const responses = JSON.parse(interview.responses);
 
-        // Answer save karo
+        // Answer save 
         if (!responses.answers) responses.answers = [];
         responses.answers[question_index] = {
             question: responses.questions[question_index],
@@ -226,7 +231,7 @@ const saveResponse = async (req, res) => {
 };
 
 // ============================================
-// VIDEO UPLOAD KARNA
+// VIDEO UPLOAD
 // POST /api/interview/upload-video/:id
 // ============================================
 const uploadInterviewVideo = async (req, res) => {
@@ -241,7 +246,7 @@ const uploadInterviewVideo = async (req, res) => {
         const interviewId = req.params.id;
         const videoPath = `/uploads/interviews/${req.file.filename}`;
 
-        // Interview check karo
+        // Interview check
         const [interviews] = await db.query(
             `SELECT i.* FROM interviews i
              JOIN job_seeker_profiles jsp ON i.seeker_id = jsp.id
@@ -256,7 +261,7 @@ const uploadInterviewVideo = async (req, res) => {
             });
         }
 
-        // Purani video delete karo agar hai
+        // privious video delete if exist 
         if (interviews[0].video_path) {
             const oldPath = `.${interviews[0].video_path}`;
             if (fs.existsSync(oldPath)) {
@@ -264,7 +269,7 @@ const uploadInterviewVideo = async (req, res) => {
             }
         }
 
-        // Video path save karo
+        // Video path save
         await db.query(
             'UPDATE interviews SET video_path = ? WHERE id = ?',
             [videoPath, interviewId]
@@ -287,7 +292,7 @@ const uploadInterviewVideo = async (req, res) => {
 };
 
 // ============================================
-// INTERVIEW COMPLETE KARNA
+// INTERVIEW COMPLETE
 // PUT /api/interview/complete/:id
 // ============================================
 const completeInterview = async (req, res) => {
@@ -313,7 +318,7 @@ const completeInterview = async (req, res) => {
             [interviewId]
         );
 
-        // Provider ko notification bhejo agar job linked hai
+        // send notification to provider if job_id exist
         if (interviews[0].job_id) {
             const [jobs] = await db.query(
                 `SELECT j.*, jpp.user_id as provider_user_id, u.name as seeker_name
@@ -354,7 +359,7 @@ const completeInterview = async (req, res) => {
 };
 
 // ============================================
-// BEHAVIOR LOG SAVE KARNA (Webcam monitoring)
+// BEHAVIOR LOG SAVE (Webcam monitoring)
 // POST /api/interview/behavior/:id
 // ============================================
 const saveBehaviorLog = async (req, res) => {
@@ -376,7 +381,7 @@ const saveBehaviorLog = async (req, res) => {
             [interviewId, behavior_type]
         );
 
-        // Count karo kitni baar yeh behavior hua
+        // count total flags for this behavior type in this interview
         const [count] = await db.query(
             `SELECT COUNT(*) as total FROM behavior_logs 
              WHERE interview_id = ? AND behavior_type = ?`,
@@ -400,7 +405,7 @@ const saveBehaviorLog = async (req, res) => {
 };
 
 // ============================================
-// APNI INTERVIEWS DEKHNA
+// Over INTERVIEWS View
 // GET /api/interview/my
 // ============================================
 const getMyInterviews = async (req, res) => {
@@ -445,7 +450,7 @@ const getMyInterviews = async (req, res) => {
 };
 
 // ============================================
-// PROVIDER - CANDIDATE KI INTERVIEW DEKHNA
+// PROVIDER - CANDIDATE INTERVIEW View
 // GET /api/interview/view/:id
 // ============================================
 const viewInterview = async (req, res) => {
@@ -469,7 +474,7 @@ const viewInterview = async (req, res) => {
             });
         }
 
-        // Behavior logs bhi lao
+        // Behavior logs
         const [behaviorLogs] = await db.query(
             `SELECT behavior_type, COUNT(*) as count
              FROM behavior_logs

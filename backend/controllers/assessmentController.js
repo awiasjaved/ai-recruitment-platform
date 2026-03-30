@@ -127,13 +127,13 @@ const getRandomQuestions = (skill, count = 7) => {
     const skillLower = skill.toLowerCase();
     let questions = questionBank[skillLower] || questionBank['default'];
 
-    // Shuffle karo
+    // Shuffle
     const shuffled = [...questions].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, count);
 };
 
 // ============================================
-// ASSESSMENT SHURU KARNA
+// ASSESSMENT Start
 // POST /api/assessment/start
 // ============================================
 const startAssessment = async (req, res) => {
@@ -147,7 +147,7 @@ const startAssessment = async (req, res) => {
             });
         }
 
-        // Seeker profile lao
+        // Seeker profile
         const [profiles] = await db.query(
             'SELECT id FROM job_seeker_profiles WHERE user_id = ?',
             [req.user.id]
@@ -162,7 +162,7 @@ const startAssessment = async (req, res) => {
 
         const seekerId = profiles[0].id;
 
-        // Check karo koi pending assessment toh nahi
+        // check any pending Assessments
         const [pending] = await db.query(
             `SELECT id FROM assessments 
              WHERE seeker_id = ? AND skill_domain = ? AND status = 'pending'`,
@@ -177,10 +177,10 @@ const startAssessment = async (req, res) => {
             });
         }
 
-        // Random questions generate karo
+        // Random questions generate
         const questions = getRandomQuestions(skill_domain);
 
-        // Questions se answers field hata do (security)
+        // change question format for client
         const questionsForClient = questions.map((q, index) => ({
             id: index + 1,
             question: q.question,
@@ -189,7 +189,7 @@ const startAssessment = async (req, res) => {
             options: q.options || null
         }));
 
-        // Assessment database mein save karo
+        // Assessment save in database 
         const [result] = await db.query(
             `INSERT INTO assessments (seeker_id, skill_domain, questions, status) 
              VALUES (?, ?, ?, 'pending')`,
@@ -216,7 +216,7 @@ const startAssessment = async (req, res) => {
 };
 
 // ============================================
-// ASSESSMENT SUBMIT KARNA
+// ASSESSMENT SUBMIT
 // POST /api/assessment/submit/:id
 // ============================================
 const submitAssessment = async (req, res) => {
@@ -231,7 +231,7 @@ const submitAssessment = async (req, res) => {
             });
         }
 
-        // Assessment lao
+        // Assessment 
         const [assessments] = await db.query(
             `SELECT a.*, jsp.user_id FROM assessments a
              JOIN job_seeker_profiles jsp ON a.seeker_id = jsp.id
@@ -255,10 +255,10 @@ const submitAssessment = async (req, res) => {
             });
         }
 
-        // Questions parse karo
+        // Questions parse 
         const questions = JSON.parse(assessment.questions);
 
-        // Score calculate karo
+        // Score calculate 
         let totalScore = 0;
         let maxScore = 0;
         const gradedAnswers = [];
@@ -280,7 +280,7 @@ const submitAssessment = async (req, res) => {
                     marks_obtained: isCorrect ? question.marks : 0
                 });
             } else {
-                // Subjective - partial marks do agar answer likha hai
+                // Subjective - partial marks if answer is not empty and has some length
                 const hasAnswer = userAnswer && userAnswer.toString().trim().length > 10;
                 const subjectiveMarks = hasAnswer ? Math.floor(question.marks * 0.6) : 0;
                 totalScore += subjectiveMarks;
@@ -289,15 +289,15 @@ const submitAssessment = async (req, res) => {
                     question: question.question,
                     user_answer: userAnswer,
                     marks_obtained: subjectiveMarks,
-                    note: 'Subjective answer - partial marks diye gaye'
+                    note: 'Subjective answer - partial marks here, manual review needed for final evaluation'
                 });
             }
         });
 
-        // Percentage nikalo
+        // Percentage 
         const percentage = Math.round((totalScore / maxScore) * 100);
 
-        // Assessment update karo
+        // Assessment update
         await db.query(
             `UPDATE assessments SET 
              answers = ?, score = ?, status = 'completed'
@@ -305,7 +305,7 @@ const submitAssessment = async (req, res) => {
             [JSON.stringify(gradedAnswers), percentage, assessmentId]
         );
 
-        // Result ke hisaab se message
+        // massge result
         let resultMessage = '';
         if (percentage >= 80) resultMessage = 'Bohat acha! Excellent performance!';
         else if (percentage >= 60) resultMessage = 'Acha! Good performance!';
@@ -335,7 +335,7 @@ const submitAssessment = async (req, res) => {
 };
 
 // ============================================
-// APNI ASSESSMENTS DEKHNA
+// Over ASSESSMENTS View
 // GET /api/assessment/my
 // ============================================
 const getMyAssessments = async (req, res) => {
@@ -377,7 +377,7 @@ const getMyAssessments = async (req, res) => {
 };
 
 // ============================================
-// EK ASSESSMENT KA RESULT DEKHNA
+// Once ASSESSMENT  RESULT View
 // GET /api/assessment/:id
 // ============================================
 const getAssessmentResult = async (req, res) => {

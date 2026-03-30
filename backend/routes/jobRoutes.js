@@ -11,11 +11,11 @@ const {
 } = require('../controllers/jobController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
-// Public routes - koi bhi dekh sakta hai
+// Public routes
 router.get('/', getAllJobs);
 router.get('/:id', getJobById);
 
-// Protected - sirf job_provider
+// Protected - just for job_provider routes
 router.post('/create', protect, authorize('job_provider'), createJob);
 router.get('/provider/my-jobs', protect, authorize('job_provider'), getMyJobs);
 router.put('/:id', protect, authorize('job_provider'), updateJob);

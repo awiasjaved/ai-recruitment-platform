@@ -1,9 +1,9 @@
 const db = require('../config/db');
 
 // ============================================
-// JOB POST KARNA
+// JOB POST
 // POST /api/jobs/create
-// Sirf job_provider kar sakta hai
+// just job_provider
 // ============================================
 const createJob = async (req, res) => {
     try {
@@ -17,7 +17,7 @@ const createJob = async (req, res) => {
             });
         }
 
-        // Provider ka profile lao
+        // Provider profile view
         const [profiles] = await db.query(
             'SELECT id FROM job_provider_profiles WHERE user_id = ?',
             [req.user.id]
@@ -32,7 +32,7 @@ const createJob = async (req, res) => {
 
         const providerId = profiles[0].id;
 
-        // Job database mein save karo
+        // job save in database
         const [result] = await db.query(
             `INSERT INTO jobs (provider_id, title, description, required_skills, experience_level, job_type) 
              VALUES (?, ?, ?, ?, ?, ?)`,
@@ -46,7 +46,7 @@ const createJob = async (req, res) => {
             ]
         );
 
-        // Matching job seekers ko notification bhejo
+        // Send notification to matching seekers
         const skillsList = required_skills.split(',').map(s => s.trim());
 
         for (const skill of skillsList) {
@@ -62,7 +62,7 @@ const createJob = async (req, res) => {
                     `INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)`,
                     [
                         seeker.id,
-                        `Nai job available hai tumhari skills ke liye: ${title}`,
+                        `New Job Available: ${title}`,
                         'job_match'
                     ]
                 );
@@ -86,9 +86,9 @@ const createJob = async (req, res) => {
 };
 
 // ============================================
-// SAARI JOBS DEKHNA
+// All JOBS View
 // GET /api/jobs
-// Sab dekh sakte hain
+// All users View
 // ============================================
 const getAllJobs = async (req, res) => {
     try {
@@ -146,7 +146,7 @@ const getAllJobs = async (req, res) => {
 };
 
 // ============================================
-// EK JOB DEKHNA
+// once JOB View
 // GET /api/jobs/:id
 // ============================================
 const getJobById = async (req, res) => {
@@ -183,7 +183,7 @@ const getJobById = async (req, res) => {
 };
 
 // ============================================
-// APNI JOBS DEKHNA (Provider ke liye)
+// Over JOBS View (Provider)
 // GET /api/jobs/my-jobs
 // ============================================
 const getMyJobs = async (req, res) => {
@@ -228,14 +228,14 @@ const getMyJobs = async (req, res) => {
 };
 
 // ============================================
-// JOB UPDATE KARNA
+// JOB UPDATE
 // PUT /api/jobs/:id
 // ============================================
 const updateJob = async (req, res) => {
     try {
         const { title, description, required_skills, experience_level, job_type, status } = req.body;
 
-        // Check karo yeh job is provider ki hai ya nahi
+        // check this job is provider's job
         const [jobs] = await db.query(
             `SELECT j.* FROM jobs j
              JOIN job_provider_profiles jpp ON j.provider_id = jpp.id
@@ -278,7 +278,7 @@ const updateJob = async (req, res) => {
 };
 
 // ============================================
-// JOB DELETE KARNA
+// JOB DELETE
 // DELETE /api/jobs/:id
 // ============================================
 const deleteJob = async (req, res) => {
@@ -315,12 +315,12 @@ const deleteJob = async (req, res) => {
 };
 
 // ============================================
-// JOB KE CANDIDATES DEKHNA (Provider ke liye)
+// JOB CANDIDATES check  (Provider)
 // GET /api/jobs/:id/candidates
 // ============================================
 const getJobCandidates = async (req, res) => {
     try {
-        // Pehle check karo yeh job is provider ki hai
+        // check this job is provider's job
         const [jobs] = await db.query(
             `SELECT j.* FROM jobs j
              JOIN job_provider_profiles jpp ON j.provider_id = jpp.id
@@ -335,7 +335,7 @@ const getJobCandidates = async (req, res) => {
             });
         }
 
-        // Is job ke saare candidates lao
+        // Get candidates with interview and assessment details
         const [candidates] = await db.query(
             `SELECT 
                 u.id, u.name, u.email,

@@ -8,7 +8,7 @@ const {
 } = require('../controllers/notificationController');
 const { protect } = require('../middleware/authMiddleware');
 
-// Sab logged in users ke liye
+// For all authenticated users - both job_seekers and job_providers
 router.get('/', protect, getNotifications);
 router.put('/read-all', protect, markAllAsRead);
 router.put('/:id/read', protect, markAsRead);

@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 // ============================================
-// MULTER SETUP - CV Upload ke liye
+// MULTER SETUP - For CV Upload
 // ============================================
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -37,7 +37,7 @@ const upload = multer({
 });
 
 // ============================================
-// JOB SEEKER - PROFILE DEKHNA
+// JOB SEEKER - PROFILE View
 // GET /api/profile/seeker
 // ============================================
 const getSeekerProfile = async (req, res) => {
@@ -59,7 +59,7 @@ const getSeekerProfile = async (req, res) => {
             });
         }
 
-        // Assessment scores bhi lao
+        // Assessment scores
         const [assessments] = await db.query(
             `SELECT skill_domain, score, status, taken_at 
              FROM assessments 
@@ -85,14 +85,14 @@ const getSeekerProfile = async (req, res) => {
 };
 
 // ============================================
-// JOB SEEKER - PROFILE UPDATE KARNA
+// JOB SEEKER - For PROFILE UPDATE
 // PUT /api/profile/seeker
 // ============================================
 const updateSeekerProfile = async (req, res) => {
     try {
         const { name, skills, education, experience, bio } = req.body;
 
-        // Name update karo users table mein
+        // Update Name in users table
         if (name) {
             await db.query(
                 'UPDATE users SET name = ? WHERE id = ?',
@@ -100,7 +100,7 @@ const updateSeekerProfile = async (req, res) => {
             );
         }
 
-        // Profile update karo
+        // Profile update 
         await db.query(
             `UPDATE job_seeker_profiles SET
              skills = COALESCE(?, skills),
@@ -111,7 +111,7 @@ const updateSeekerProfile = async (req, res) => {
             [skills, education, experience, bio, req.user.id]
         );
 
-        // Updated profile wapas bhejo
+        // Updated profile
         const [updated] = await db.query(
             `SELECT u.name, u.email, jsp.skills, jsp.education, 
              jsp.experience, jsp.cv_path, jsp.bio
@@ -138,7 +138,7 @@ const updateSeekerProfile = async (req, res) => {
 };
 
 // ============================================
-// JOB SEEKER - CV UPLOAD KARNA
+// JOB SEEKER - CV UPLOAD
 // POST /api/profile/seeker/upload-cv
 // ============================================
 const uploadCV = async (req, res) => {
@@ -152,7 +152,7 @@ const uploadCV = async (req, res) => {
 
         const cvPath = `/uploads/cvs/${req.file.filename}`;
 
-        // Purani CV delete karo agar hai
+        // Delete old CV if exists
         const [profiles] = await db.query(
             'SELECT cv_path FROM job_seeker_profiles WHERE user_id = ?',
             [req.user.id]
@@ -165,7 +165,7 @@ const uploadCV = async (req, res) => {
             }
         }
 
-        // Naya path save karo
+        // New Cv path save in database
         await db.query(
             'UPDATE job_seeker_profiles SET cv_path = ? WHERE user_id = ?',
             [cvPath, req.user.id]
@@ -188,7 +188,7 @@ const uploadCV = async (req, res) => {
 };
 
 // ============================================
-// JOB PROVIDER - PROFILE DEKHNA
+// JOB PROVIDER - PROFILE View
 // GET /api/profile/provider
 // ============================================
 const getProviderProfile = async (req, res) => {
@@ -210,7 +210,7 @@ const getProviderProfile = async (req, res) => {
             });
         }
 
-        // Posted jobs bhi lao
+        // Posted jobs View
         const [jobs] = await db.query(
             `SELECT id, title, status, experience_level, job_type, posted_at
              FROM jobs 
@@ -236,14 +236,14 @@ const getProviderProfile = async (req, res) => {
 };
 
 // ============================================
-// JOB PROVIDER - PROFILE UPDATE KARNA
+// JOB PROVIDER - PROFILE UPDATE
 // PUT /api/profile/provider
 // ============================================
 const updateProviderProfile = async (req, res) => {
     try {
         const { name, company_name, industry, website, description } = req.body;
 
-        // Name update karo
+        // Name update
         if (name) {
             await db.query(
                 'UPDATE users SET name = ? WHERE id = ?',
@@ -251,7 +251,7 @@ const updateProviderProfile = async (req, res) => {
             );
         }
 
-        // Company profile update karo
+        // Company profile update
         await db.query(
             `UPDATE job_provider_profiles SET
              company_name = COALESCE(?, company_name),
@@ -262,7 +262,7 @@ const updateProviderProfile = async (req, res) => {
             [company_name, industry, website, description, req.user.id]
         );
 
-        // Updated profile wapas bhejo
+        // Updated profile
         const [updated] = await db.query(
             `SELECT u.name, u.email, jpp.company_name, jpp.industry, 
              jpp.website, jpp.description
@@ -289,9 +289,9 @@ const updateProviderProfile = async (req, res) => {
 };
 
 // ============================================
-// KISI BHI SEEKER KI PUBLIC PROFILE DEKHNA
+// Get any seeker profile - Public View
 // GET /api/profile/seeker/:id
-// Provider dekh sakta hai
+// Provider View
 // ============================================
 const getPublicSeekerProfile = async (req, res) => {
     try {
@@ -311,7 +311,7 @@ const getPublicSeekerProfile = async (req, res) => {
             });
         }
 
-        // Assessment results bhi dikhao
+        // Assessment results
         const [assessments] = await db.query(
             `SELECT a.skill_domain, a.score, a.taken_at
              FROM assessments a

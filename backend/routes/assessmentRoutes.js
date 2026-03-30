@@ -9,10 +9,10 @@ const {
 } = require('../controllers/assessmentController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
-// Skills list - sab dekh sakte hain
+// Skills list
 router.get('/skills', getAvailableSkills);
 
-// Sirf job_seeker ke liye
+// Just for job-seekers Routes
 router.post('/start', protect, authorize('job_seeker'), startAssessment);
 router.post('/submit/:id', protect, authorize('job_seeker'), submitAssessment);
 router.get('/my', protect, authorize('job_seeker'), getMyAssessments);
