@@ -307,14 +307,14 @@ const submitAssessment = async (req, res) => {
 
         // massge result
         let resultMessage = '';
-        if (percentage >= 80) resultMessage = 'Bohat acha! Excellent performance!';
-        else if (percentage >= 60) resultMessage = 'Acha! Good performance!';
-        else if (percentage >= 40) resultMessage = 'Theek hai. Average performance.';
-        else resultMessage = 'Aur mehnat karo. Keep practicing!';
+        if (percentage >= 80) resultMessage = ' Excellent performance!';
+        else if (percentage >= 60) resultMessage = ' Good performance!';
+        else if (percentage >= 40) resultMessage = ' Average performance.';
+        else resultMessage = 'Keep practicing!';
 
         res.status(200).json({
             success: true,
-            message: 'Assessment complete ho gayi!',
+            message: 'Assessment completed!',
             result: {
                 score: percentage,
                 total_marks: maxScore,
