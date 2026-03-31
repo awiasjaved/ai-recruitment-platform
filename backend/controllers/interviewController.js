@@ -450,19 +450,20 @@ const getMyInterviews = async (req, res) => {
 };
 
 // ============================================
-// PROVIDER - CANDIDATE INTERVIEW View
+// PROVIDER / SEEKER / ADMIN - INTERVIEW View
 // GET /api/interview/view/:id
 // ============================================
 const viewInterview = async (req, res) => {
     try {
         const [interviews] = await db.query(
             `SELECT i.*, u.name as seeker_name, u.email as seeker_email,
-             jsp.skills, jsp.education, jsp.experience,
-             j.title as job_title
+             jsp.user_id as seeker_user_id, jsp.skills, jsp.education, jsp.experience,
+             j.title as job_title, jpp.user_id as provider_user_id, jpp.company_name
              FROM interviews i
              JOIN job_seeker_profiles jsp ON i.seeker_id = jsp.id
              JOIN users u ON jsp.user_id = u.id
              LEFT JOIN jobs j ON i.job_id = j.id
+             LEFT JOIN job_provider_profiles jpp ON j.provider_id = jpp.id
              WHERE i.id = ?`,
             [req.params.id]
         );
@@ -471,6 +472,18 @@ const viewInterview = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: 'Interview nahi mili'
+            });
+        }
+
+        const interview = interviews[0];
+        const isAdmin = req.user.role === 'admin';
+        const isOwnerSeeker = req.user.role === 'job_seeker' && interview.seeker_user_id === req.user.id;
+        const isOwnerProvider = req.user.role === 'job_provider' && interview.provider_user_id === req.user.id;
+
+        if (!isAdmin && !isOwnerSeeker && !isOwnerProvider) {
+            return res.status(403).json({
+                success: false,
+                message: 'Aap is interview ko view nahi kar sakte'
             });
         }
 
@@ -483,13 +496,22 @@ const viewInterview = async (req, res) => {
             [req.params.id]
         );
 
-        const interview = interviews[0];
+        let parsedResponses = null;
+        if (interview.responses) {
+            try {
+                parsedResponses = JSON.parse(interview.responses);
+            } catch (parseError) {
+                parsedResponses = interview.responses;
+            }
+        }
+
+        const { seeker_user_id, provider_user_id, ...safeInterview } = interview;
 
         res.status(200).json({
             success: true,
             interview: {
-                ...interview,
-                responses: interview.responses ? JSON.parse(interview.responses) : null
+                ...safeInterview,
+                responses: parsedResponses
             },
             behavior_summary: behaviorLogs
         });

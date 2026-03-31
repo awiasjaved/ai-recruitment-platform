@@ -11,7 +11,7 @@ router.put('/complete/:id', protect, authorize('job_seeker'), interviewControlle
 router.post('/behavior/:id', protect, authorize('job_seeker'), interviewController.saveBehaviorLog);
 router.get('/my', protect, authorize('job_seeker'), interviewController.getMyInterviews);
 
-// Job Provider routes
-router.get('/view/:id', protect, authorize('job_provider', 'admin'), interviewController.viewInterview);
+// Interview view route - owner seeker, related provider, or admin
+router.get('/view/:id', protect, interviewController.viewInterview);
 
 module.exports = router;
