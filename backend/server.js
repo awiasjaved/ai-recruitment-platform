@@ -27,6 +27,7 @@ const profileRoutes = require('./routes/profileRoutes');
 const assessmentRoutes = require('./routes/assessmentRoutes');
 const interviewRoutes = require('./routes/interviewRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 // ============================================
 // Routes Use
@@ -37,9 +38,9 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/assessment', assessmentRoutes);
 app.use('/api/interview', interviewRoutes);
 app.use('/api/notifications', notificationRoutes);
-
+app.use('/api/admin', adminRoutes);
 // ============================================
-// Root Route - Test karne ke liye
+// Root Route - For Test
 // ============================================
 app.get('/', (req, res) => {
     res.json({
