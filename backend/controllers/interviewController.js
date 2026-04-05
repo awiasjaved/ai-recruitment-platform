@@ -336,7 +336,7 @@ const completeInterview = async (req, res) => {
                     `INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)`,
                     [
                         jobs[0].provider_user_id,
-                        `${jobs[0].seeker_name} ne tumhari job "${jobs[0].title}" ke liye interview complete kar li!`,
+                        `${jobs[0].seeker_name} has completed the interview for your job "${jobs[0].title}"!`,
                         'candidate_match'
                     ]
                 );

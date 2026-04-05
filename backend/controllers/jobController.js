@@ -318,9 +318,57 @@ const deleteJob = async (req, res) => {
 // JOB CANDIDATES check  (Provider)
 // GET /api/jobs/:id/candidates
 // ============================================
+// const getJobCandidates = async (req, res) => {
+//     try {
+//         // check this job is provider's job
+//         const [jobs] = await db.query(
+//             `SELECT j.* FROM jobs j
+//              JOIN job_provider_profiles jpp ON j.provider_id = jpp.id
+//              WHERE j.id = ? AND jpp.user_id = ?`,
+//             [req.params.id, req.user.id]
+//         );
+
+//         if (jobs.length === 0) {
+//             return res.status(404).json({
+//                 success: false,
+//                 message: 'Job nahi mili ya tumhari permission nahi'
+//             });
+//         }
+
+//         // Get candidates with interview and assessment details
+//         const [candidates] = await db.query(
+//             `SELECT 
+//                 u.id, u.name, u.email,
+//                 jsp.skills, jsp.education, jsp.experience, jsp.cv_path,
+//                 i.video_path, i.conducted_at, i.status as interview_status,
+//                 a.score as assessment_score, a.skill_domain
+//              FROM interviews i
+//              JOIN job_seeker_profiles jsp ON i.seeker_id = jsp.id
+//              JOIN users u ON jsp.user_id = u.id
+//              LEFT JOIN assessments a ON a.seeker_id = jsp.id
+//              WHERE i.job_id = ?
+//              ORDER BY a.score DESC`,
+//             [req.params.id]
+//         );
+
+//         res.status(200).json({
+//             success: true,
+//             count: candidates.length,
+//             candidates
+//         });
+
+//     } catch (error) {
+//         console.error('GetJobCandidates error:', error.message);
+//         res.status(500).json({
+//             success: false,
+//             message: 'Server error',
+//             error: error.message
+//         });
+//     }
+// };
+
 const getJobCandidates = async (req, res) => {
     try {
-        // check this job is provider's job
         const [jobs] = await db.query(
             `SELECT j.* FROM jobs j
              JOIN job_provider_profiles jpp ON j.provider_id = jpp.id
@@ -335,19 +383,25 @@ const getJobCandidates = async (req, res) => {
             });
         }
 
-        // Get candidates with interview and assessment details
+        // ← Yeh query replace karo
         const [candidates] = await db.query(
-            `SELECT 
+            `SELECT DISTINCT
                 u.id, u.name, u.email,
                 jsp.skills, jsp.education, jsp.experience, jsp.cv_path,
                 i.video_path, i.conducted_at, i.status as interview_status,
-                a.score as assessment_score, a.skill_domain
+                (SELECT a.score FROM assessments a 
+                 WHERE a.seeker_id = jsp.id 
+                 AND a.status = 'completed'
+                 ORDER BY a.score DESC LIMIT 1) as assessment_score,
+                (SELECT a.skill_domain FROM assessments a 
+                 WHERE a.seeker_id = jsp.id 
+                 AND a.status = 'completed'
+                 ORDER BY a.score DESC LIMIT 1) as skill_domain
              FROM interviews i
              JOIN job_seeker_profiles jsp ON i.seeker_id = jsp.id
              JOIN users u ON jsp.user_id = u.id
-             LEFT JOIN assessments a ON a.seeker_id = jsp.id
              WHERE i.job_id = ?
-             ORDER BY a.score DESC`,
+             GROUP BY u.id`,
             [req.params.id]
         );
 
